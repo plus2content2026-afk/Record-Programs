@@ -1,11 +1,6 @@
 import mysql.connector as m
 
-con = m.connect(
-    host="localhost",
-    user="root",
-    password="student",
-    database="db1"
-)
+con = m.connect(host="localhost", user="root", password="student", database="db1")
 c = con.cursor()
 
 def add_hra():
@@ -20,17 +15,15 @@ def modify_hra():
     hra = float(input("Enter new HRA: "))
     q = "UPDATE emp SET HRA=%s WHERE empno=%s"
     c.execute(q, (hra, eno))
-    c.commit()
+    con.commit()
     if c.rowcount > 0:
         print("HRA updated successfully.")
     else:
         print("Employee not found.")
 
 def display_comm():
-    q = """SELECT name, job, sal*12 AS annual_salary 
-           FROM emp 
-           WHERE comm IS NOT NULL 
-           ORDER BY sal DESC"""
+    q = "SELECT empname, job, sal*12 AS annual_salary \
+FROM emp WHERE comm IS NOT NULL ORDER BY sal DESC"
     c.execute(q)
     data = c.fetchall()
     print("{:<20} {:<15} {:>15}".format("NAME", "JOB", "ANNUAL SALARY"))
@@ -42,17 +35,15 @@ def delete_emp():
     eno = int(input("Enter employee number to delete: "))
     q = "DELETE FROM emp WHERE empno=%s"
     c.execute(q, (eno,))
-    c.commit()
+    con.commit()
     if c.rowcount > 0:
         print("Employee record deleted successfully.")
     else:
         print("Employee not found.")
 
 def display_job():
-    q = """SELECT e.empno, e.name, e.job, d.dname 
-           FROM emp e, dept d 
-           WHERE e.deptno = d.deptno 
-           AND e.job IN ('MANAGER','CLERK')"""
+    q = "SELECT e.empno, e.name, e.job, d.dname FROM\
+emp e, dept d WHERE e.deptno = d.deptno AND e.job IN ('MANAGER','CLERK')"
     c.execute(q)
     data = c.fetchall()
     print("{:<10} {:<20} {:<15} {:<20}".format("EMPNO", "NAME", "JOB", "DEPARTMENT"))
@@ -61,42 +52,20 @@ def display_job():
         print("{:<10} {:<20} {:<15} {:<20}".format(r[0], r[1], r[2], r[3]))
 
 def salary_details():
-    q = """SELECT job, MIN(sal), MAX(sal), SUM(sal), AVG(sal), COUNT(*) 
-           FROM emp 
-           GROUP BY job"""
+    q = "SELECT job, MIN(sal), MAX(sal), SUM(sal), AVG(sal), COUNT(*) FROM emp GROUP BY job"
     c.execute(q)
     data = c.fetchall()
-    print("{:<15} {:>10} {:>10} {:>12} {:>12} {:>8}".format("JOB", "MIN", "MAX", "SUM", "AVERAGE", "COUNT"))
+    print("{:<15} {:>10} {:>10} {:>12} {:>12} {:>8}"\
+          .format("JOB", "MIN", "MAX", "SUM", "AVERAGE", "COUNT"))
     print("-" * 72)
     for r in data:
-        print("{:<15} {:>10.2f} {:>10.2f} {:>12.2f} {:>12.2f} {:>8}".format(r[0], float(r[1]), float(r[2]), float(r[3]), float(r[4]), r[5]))
+        print("{:<15} {:>10.2f} {:>10.2f} {:>12.2f} {:>12.2f} {:>8}"\
+              .format(r[0], float(r[1]), float(r[2]), float(r[3]), float(r[4]), r[5]))
 
-while True:
-    print("\n========== EMPLOYEE MENU ==========")
-    print("1. Add HRA column")
-    print("2. Modify HRA")
-    print("3. Display employees with commission")
-    print("4. Delete Employee")
-    print("5. Display Managers and Clerks")
-    print("6. Display salary details job-wise")
-    print("7. Exit")
-    
-    ch = int(input("Enter your choice: "))
-    if ch == 1:
-        add_hra()
-    elif ch == 2:
-        modify_hra()
-    elif ch == 3:
-        display_comm()
-    elif ch == 4:
-        delete_emp()
-    elif ch == 5:
-        display_job()
-    elif ch == 6:
-        salary_details()
-    elif ch == 7:
-        break
-    else:
-        print("Invalid choice")
-
+add_hra()
+modify_hra()
+display_comm()
+delete_emp()
+display_job()
+salary_details()
 con.close()
